@@ -1,0 +1,393 @@
+<style>
+img{cursor:pointer;}
+@media (min-width: 1700px) {
+    .container {
+        width: 1440px;
+    }
+}
+
+.operating-point-controls {
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.operating-point-controls .form-group {
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+
+.operating-point-controls .form-control {
+    width: 80px;
+    display: inline-block;
+}
+
+/* 表格整合样式 */
+.comparison-table-container {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.chart-row {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.chart-cell {
+    padding: 15px;
+    text-align: center;
+    vertical-align: top;
+    position: relative;
+}
+
+.chart-container {
+    height: 300px;
+    width: 100%;
+    margin: 0 auto;
+    min-width: 250px;
+}
+
+/* 动态列宽 - 根据风机数量自适应 */
+.table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* 2个风机对比 */
+.fan-count-2 .parameter-cell {
+    width: 25%;
+}
+
+.fan-count-2 .value-cell,
+.fan-count-2 .chart-cell {
+    width: 37.5%;
+}
+
+.fan-count-2 .chart-container {
+    max-width: 450px;
+}
+
+/* 3个风机对比 */
+.fan-count-3 .parameter-cell {
+    width: 20%;
+}
+
+.fan-count-3 .value-cell,
+.fan-count-3 .chart-cell {
+    width: 26.67%;
+}
+
+.fan-count-3 .chart-container {
+    max-width: 350px;
+}
+
+/* 4个风机对比 */
+.fan-count-4 .parameter-cell {
+    width: 16%;
+}
+
+.fan-count-4 .value-cell,
+.fan-count-4 .chart-cell {
+    width: 21%;
+}
+
+.fan-count-4 .chart-container {
+    max-width: 280px;
+}
+
+.fan-model-header {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.fan-type-subtitle {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.operating-point-info {
+    background: #e9ecef;
+    padding: 8px;
+    border-radius: 3px;
+    /*font-size: 11px;*/
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* 操作点表格样式 */
+.operating-point-table .op-cell {
+    border: none !important;
+    padding: 12px 8px;
+    /*font-size: 11px;*/
+    line-height: 1.2;
+    /*text-align: left;*/
+}
+
+.operating-point-table {
+    margin-bottom: 0 !important;
+}
+
+#operating-point-row td {
+    vertical-align: middle;
+    padding: 8px !important;
+}
+
+#operating-point-row {
+    background-color: #f9f9f9;
+    border-left: 3px solid #337ab7;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .fan-count-4 .chart-container {
+        max-width: 250px;
+        height: 280px;
+    }
+    
+    .fan-count-3 .chart-container {
+        max-width: 280px;
+        height: 280px;
+    }
+}
+
+@media (max-width: 992px) {
+    .comparison-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table {
+        min-width: 800px; /* 4个风机时的最小宽度 */
+        table-layout: auto;
+    }
+    
+    .chart-container {
+        height: 250px;
+        min-width: 220px;
+        max-width: 300px;
+    }
+    
+    .chart-cell {
+        padding: 10px;
+        min-width: 240px;
+    }
+    
+    .parameter-cell {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .table {
+        min-width: 600px; /* 移动端最小宽度 */
+    }
+    
+    .chart-container {
+        height: 220px;
+        min-width: 200px;
+        max-width: 250px;
+    }
+    
+    .chart-cell {
+        padding: 8px;
+        min-width: 220px;
+    }
+    
+    .fan-model-header {
+        font-size: 12px;
+    }
+    
+    .fan-type-subtitle {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 200px;
+        min-width: 180px;
+        max-width: 220px;
+    }
+    
+    .operating-point-controls .form-control {
+        width: 60px;
+    }
+}
+
+/* 表格样式优化 */
+.table > thead > tr > th,
+.table > tbody > tr > td {
+    vertical-align: middle;
+    padding: 12px 8px;
+}
+
+.table > thead > tr > th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+.parameter-cell {
+    font-weight: 500;
+    background-color: #fafafa;
+}
+
+.value-cell {
+    text-align: center;
+}
+
+.operating-point-info{display:none !important;}
+</style>
+
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                {:__('Fan Comparison')}
+                <a style="display:none;" href="javascript:;" class="btn btn-xs btn-default pull-right" onclick="window.print()"><i class="fa fa-print"></i> {:__('Print')}</a>
+                <a style="display:none;" href="javascript:;" class="btn btn-xs btn-default pull-right margin-right-5" id="export-pdf"><i class="fa fa-file-pdf-o"></i> {:__('Export PDF')}</a>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <!-- 操作点输入控制 -->
+            <div class="operating-point-controls">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label style="min-width:88px;">{:__('Air flow')}:</label>
+                        <input type="text" class="form-control input-sm" id="set-flow" value="1000" placeholder="Flow">
+                        <span class="unit flow-unit">m³/h</span>
+                    </div>
+                    <div class="form-group">
+                        <label style="min-width:80px;">{:__('Pressure')}:</label>
+                        <input type="text" class="form-control input-sm" id="set-pressure" value="200" placeholder="Pressure">
+                        <span class="unit pressure-unit">Pa</span>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" id="calculate-all-points">{:__('Calculate All')}</button>
+                    <button type="button" class="btn btn-default btn-sm" id="clear-all-curves">{:__('Clear All')}</button>
+                </div>
+                <div class="alert alert-info" style="margin-top: 10px; margin-bottom: 0;">
+                    <small><i class="fa fa-info-circle"></i> {:__('Click on any chart to set operating point and calculate curves for all fans')}</small>
+                </div>
+            </div>
+
+            <!-- 整合的对比表格 -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <h4>{:__('Fan Comparison')}</h4>
+                    <div class="comparison-table-container">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover two-column-comparison">
+                                <thead>
+                                    <tr>
+                                        <th class="parameter-cell">{:__('Fan Model')}</th>
+                                        {foreach $fans as $fan}
+                                        <th class="text-center value-cell">
+                                            <div class="fan-model-header">{$fan.fan_model}</div>
+                                            <div class="fan-type-subtitle">{$fan.type_name}</div>
+                                        </th>
+                                        {/foreach}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- 图表行 -->
+                                    <tr class="chart-row">
+                                        <td class="parameter-cell">
+                                            <strong>{:__('Performance Curve')}</strong>
+                                        </td>
+                                        {foreach $fans as $fan}
+                                        <td class="chart-cell">
+                                            <div style="display:none;" class="fan-model-header">{$fan.fan_model}</div>
+                                            <div style="display:none;" class="fan-type-subtitle">{$fan.type_name}</div>
+                                            <div class="chart-container" id="fan-chart-{$fan.id}"></div>
+                                            <div class="operating-point-info" id="op-info-{$fan.id}">
+                                                <strong>Operating Point:</strong> <span id="op-text-{$fan.id}">Click chart to set</span>
+                                            </div>
+                                        </td>
+                                        {/foreach}
+                                    </tr>
+                                    
+                                    <!-- 操作点行 - 动态插入 -->
+                                    
+                                    <!-- 参数行 -->
+
+                               <tr>
+                                    <td class="parameter-cell">{:__('Air Flow')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell"><span class="aireflow-{$fan.id}">{$fan.air_flow|default=0}</span> m³/h</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Pressure')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell"><span class="aireflow-{$fan.id}">{$fan.air_pressure|default=0}</span> Pa</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Motor power')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.rated_power|default='-'} W</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Rated Speed')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.rated_speed|default='-'} rpm</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Sound Level')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.sound_level|default='-'} dBA</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Power Type')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.powertype|default='-'}</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Operating Temperature')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.min_operating_temp|default=0} ~ {$fan.max_operating_temp|default=0} ℃</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Operating Humidity')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.work_humidity|default='-'} </td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Dimension')}(LxWxH)</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.outline_length|intval}mm x {$fan.outline_width|intval}mm x {$fan.outline_height|intval}mm</td>
+                                    {/foreach}
+                                </tr>
+                                <tr>
+                                    <td class="parameter-cell">{:__('Weight')}</td>
+                                    {foreach $fans as $fan}
+                                    <td class="text-center value-cell">{$fan.weight|default=0} kg</td>
+                                    {/foreach}
+                                </tr>
+                                
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var gfanData = {:json_encode($fans)};
+    var gfanCurves = {:json_encode($fanCurves)};
+</script>

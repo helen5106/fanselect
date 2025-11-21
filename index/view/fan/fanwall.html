@@ -1,0 +1,280 @@
+<style>
+@media (min-width: 1700px) {
+    .container {
+        width: 1440px;
+    }
+}
+
+/* 风机选项样式 */
+.fan-option {
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.fan-option:hover {
+    border-color: #5bc0de;
+    box-shadow: 0 0 10px rgba(91, 192, 222, 0.3);
+}
+
+.fan-option.selected {
+    border-color: #5bc0de;
+    background-color: #f0f9fc;
+    box-shadow: 0 0 10px rgba(91, 192, 222, 0.5);
+}
+
+/* 滑块样式 */
+input[type=range] {
+    height: 25px;
+    -webkit-appearance: none;
+    margin: 10px 0;
+    width: 100%;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 5px;
+    cursor: pointer;
+    animate: 0.2s;
+    box-shadow: 0px 0px 0px #000000;
+    background: #5cb85c;
+    border-radius: 1px;
+    border: 0px solid #000000;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    box-shadow: 0px 0px 0px #000000;
+    border: 1px solid #5cb85c;
+    height: 18px;
+    width: 18px;
+    border-radius: 25px;
+    background: #ffffff;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -7px;
+}
+
+/* 按钮组样式 */
+.btn-group-justified .btn.active {
+    background-color: #5cb85c;
+    color: white;
+    border-color: #4cae4c;
+}
+
+/* 风纪墙 20250525 */
+.fan-solution-card.selected-solution {
+	border-color: #5cb85c;
+	box-shadow: 0 0 10px rgba(92, 184, 92, 0.3);
+}
+
+.fan-solution-card.selected-solution .panel-heading {
+	background-color: #dff0d8;
+	border-color: #5cb85c;
+}
+
+.result-item {
+	transition: all 0.3s ease;
+}
+
+.result-item:hover {
+	box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.nav-tabs > li.active > a {
+	background-color: #f5f5f5;
+}
+
+.table-bordered td {
+	vertical-align: middle;
+}
+
+#search-results .panel-body {
+	max-height: none;
+	overflow: visible;
+}
+
+.download-spec-btn {
+	animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; transform: translateY(10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+/* ECharts图表容器样式 */
+[id*="single-fan-chart-"], [id*="fanwall-chart-"] {
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	background-color: #fafafa;
+}
+
+/* Tab切换时的图表重绘 */
+.tab-pane {
+	min-height: 450px;
+}
+
+/* 响应式图表 */
+@media (max-width: 768px) {
+	[id*="single-fan-chart-"], [id*="fanwall-chart-"] {
+		height: 300px !important;
+	}
+	
+	.fan-solution-card .col-md-6 {
+		margin-bottom: 20px;
+	}
+}
+
+/* 图表加载动画 */
+.chart-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 400px;
+	color: #999;
+}
+
+.chart-loading i {
+	margin-right: 10px;
+}
+</style>
+<div class="container">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {:__('Design Your Fan Wall')}
+            <small>{:__('Discover the flexibility and performance of a fan designed for your specific needs')}</small>
+        </h3>
+    </div>
+    <div class="panel-body" style="background-color: #f8f9fa;">
+        <div class="row">
+            <!-- 左侧风机类型选择 -->
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">{:__('Select Fan Wall Type')}</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="fan-type-selection">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="fan_type" value="AHU" checked>
+                                            <div class="fan-option">
+                                                <img src="__CDN__/assets/img/axial_fan.png?v=1.5" class="img-responsive center-block" style="max-height: 180px;">
+                                                <h4 class="text-center">{:__('Axial Fan')}</h4>
+                                                <p class="text-center text-muted">{:__('High airflow, lower pressure')}</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-xs-12">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="fan_type" value="CTF">
+                                            <div class="fan-option">
+                                                <img src="__CDN__/assets/img/centrifugal_fan.png?v=1.5" class="img-responsive center-block" style="max-height: 180px;">
+                                                <h4 class="text-center">{:__('Centrifugal Fan')}</h4>
+                                                <p class="text-center text-muted">{:__('Higher pressure, controlled airflow')}</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧参数配置 -->
+            <div class="col-md-8">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">{:__('Fan Configurator')}</h4>
+                    </div>
+                    <div class="panel-body">
+                        <form id="fan-configurator-form" class="form-horizontal">
+                            <!-- 宽度 -->
+                            <div class="form-group">
+                                <label for="width" class="col-sm-4 control-label">{:__('Width')} (mm):</label>
+                                <div class="col-sm-6">
+                                    <input type="range" id="width-range" class="form-control" min="60" max="200" step="10" value="120">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="number" id="width" class="form-control" value="120" min="60" max="200">
+                                </div>
+                            </div>
+                            
+                            <!-- 高度 -->
+                            <div class="form-group">
+                                <label for="height" class="col-sm-4 control-label">{:__('Height')} (mm):</label>
+                                <div class="col-sm-6">
+                                    <input type="range" id="height-range" class="form-control" min="40" max="120" step="10" value="80">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="number" id="height" class="form-control" value="80" min="40" max="120">
+                                </div>
+                            </div>
+                            
+                            <!-- 风量 -->
+                            <div class="form-group">
+                                <label for="airflow" class="col-sm-4 control-label">{:__('Airflow')} (m³/h):</label>
+                                <div class="col-sm-6">
+                                    <input type="range" id="airflow-range" class="form-control" min="5000" max="50000" step="1000" value="35000">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="number" id="airflow" class="form-control" value="35000" min="5000" max="50000">
+                                </div>
+                            </div>
+                            
+                            <!-- 静压 -->
+                            <div class="form-group">
+                                <label for="pressure" class="col-sm-4 control-label">{:__('T. Static Pressure')} (in Pa):</label>
+                                <div class="col-sm-6">
+                                    <input type="range" id="pressure-range" class="form-control" min="0.5" max="6" step="0.1" value="4.5">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="number" id="pressure" class="form-control" value="4.5" min="0.5" max="6" step="0.1">
+                                </div>
+                            </div>
+
+                            <!-- 控制器位置 -->
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{:__('Controller Location')}:</label>
+                                <div class="col-sm-8">
+                                    <div class="btn-group btn-group-justified" data-toggle="buttons">
+                                        <label class="btn btn-default active">
+                                            <input type="radio" name="controller_location" value="left" checked> {:__('Left')}
+                                        </label>
+                                        <label class="btn btn-default">
+                                            <input type="radio" name="controller_location" value="right"> {:__('Right')}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 配置按钮 -->
+                            <div class="form-group" style="margin-top: 30px;">
+                                <div class="col-sm-offset-4 col-sm-8">
+                                    <button type="button" id="configure-btn" class="btn btn-primary btn-lg btn-block">{:__('Configure')}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	<div id="result-box"></div>
+
+</div>
+</div>

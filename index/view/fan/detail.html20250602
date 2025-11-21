@@ -1,0 +1,692 @@
+
+<style>
+@media (min-width: 1700px) {
+    .container {
+        width: 1440px;
+    }
+}
+#performance-section{display:none;}
+.navbar-fixed-top{position:absolute;}
+/* 顶部固定导航 */
+.fan-header-nav {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.fan-header-nav.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.fan-model-info {
+    display: flex;
+    align-items: center;
+}
+
+.fan-image {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+}
+
+.fan-image img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.fan-model-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.fan-nav-tabs {
+    display: flex;
+    justify-content: flex-end;
+    border-bottom: none;
+    margin-top: 15px;
+}
+
+.fan-nav-tabs > li {
+    margin-left: 5px;
+}
+
+.fan-nav-tabs > li > a {
+    padding: 8px 15px;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.fan-nav-tabs > li.active > a,
+.fan-nav-tabs > li > a:hover {
+    background-color: #337ab7;
+    color: #fff;
+    border: 1px solid #337ab7;
+}
+
+/* 主内容区域 */
+.fan-detail-container {
+    padding-top: 30px;
+}
+
+.fan-section {
+    margin-bottom: 50px;
+    padding-top: 0px;
+}
+
+/* 面板样式 */
+.panel-heading {
+    position: relative;
+}
+
+.panel-heading h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+	padding: 5px 0;
+}
+
+/* 操作点控制 */
+.operating-point-controls {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.operating-point-controls .form-group {
+    margin-right: 15px;
+	margin-bottom:3px;
+}
+
+.operating-point-controls .form-control {
+    width: 80px;
+    display: inline-block;
+}
+
+.operating-point-controls .unit {
+    margin-left: 5px;
+    color: #666;
+}
+
+/* 图表容器 */
+#pressure-flow-chart,
+#power-chart,
+#efficiency-chart {
+    margin-top: 20px;
+}
+
+/* 声音图表 */
+#sound-power-chart,
+#sound-pressure-chart,
+#sound-pressure-level-chart {
+    margin-top: 10px;
+}
+
+/* 表格样式 */
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .fan-nav-tabs {
+        justify-content: center;
+    }
+    
+    .fan-model-info {
+        text-align: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    
+    .operating-point-controls .form-group {
+        margin-bottom: 10px;
+    }
+}
+
+</style>
+
+
+<!-- 将此代码添加到detail.html文件底部，在其他脚本之前 -->
+<!-- PDF导出选项模态框 -->
+<div class="modal fade" id="pdf-options-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h4 class="modal-title">{:__('Export PDF Options')}</h4>
+      </div>
+      <div class="modal-body">
+        <form id="pdf-options-form">
+          <!-- 布局选择 -->
+          <div class="form-group">
+            <label>{:__('PDF Layout')}</label>
+            <div class="radio">
+              <label>
+                <input type="radio" name="layout" value="simple" checked>
+                {:__('Simple Layout')} <small class="text-muted">({:__('Single page with basic information')})</small>
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="layout" value="detailed">
+                {:__('Detailed Layout')} <small class="text-muted">({:__('Multiple pages with comprehensive information')})</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- 内容选择 - 标准规格书内容选择 -->
+          <div class="form-group">
+            <label>{:__('Content Selection')}</label>
+            <div class="checkbox">
+              <label><input type="checkbox" id="product_images" name="content[]" value="product_images" checked disabled> {:__('Product Image')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" id="manufacturer_info" name="content[]" value="manufacturer_info" checked disabled> {:__('Manufacturer Information')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="product_intro" checked> {:__('Product Introduction')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="application_scope" checked> {:__('Application Scope')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="environmental_requirements"> {:__('Environmental Requirements')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="design_standards" checked> {:__('Design & Testing Standards')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="technical_features" checked> {:__('Technical Features')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="structure_features"> {:__('Structure Features')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="technical_parameters" checked> {:__('Technical Parameters')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="operating_point" checked> {:__('Operating Point Parameters')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="performance_curves" checked> {:__('Performance Curves')}</label>
+            </div>
+			<!--
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="test_data"> {:__('Test Data')}</label>
+            </div>
+			-->
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="dimension_drawing" checked> {:__('Dimension Drawing')}</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" name="content[]" value="wiring_diagram" checked> {:__('Wiring Diagram')}</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{:__('Cancel')}</button>
+        <button type="button" class="btn btn-primary" id="generate-pdf-btn">{:__('Generate PDF')}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 顶部固定导航 -->
+<div class="fan-header-nav">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="fan-model-info">
+                    <div class="fan-image">
+                        <img src="{$fan.image}" alt="{$fan.fan_model}">
+                    </div>
+                    <h2 class="fan-model-title">{$fan.fan_model}</h2>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <ul class="nav nav-tabs fan-nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#information-section" aria-controls="information" role="tab" data-toggle="tab">Information</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#nominal-section" aria-controls="nominal" role="tab" data-toggle="tab">Nominal parameters</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#dimensions-section" aria-controls="dimensions" role="tab" data-toggle="tab">Dimensions</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#electrical-section" aria-controls="electrical" role="tab" data-toggle="tab">Electrical connection</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 主要内容区域 -->
+<div class="container fan-detail-container">
+    <!-- 信息部分 -->
+    
+        <div class="row">
+            <!-- 左侧参数区域 -->
+            <div class="col-md-5">
+				<!--
+                <ul class="nav nav-tabs fan-nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#information-section" aria-controls="information" role="tab" data-toggle="tab">Information</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#nominal-section" aria-controls="nominal" role="tab" data-toggle="tab">Nominal parameters</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#dimensions-section" aria-controls="dimensions" role="tab" data-toggle="tab">Dimensions</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#electrical-section" aria-controls="electrical" role="tab" data-toggle="tab">Electrical connection</a>
+                    </li>
+                </ul>
+				-->
+                <div id="myTabContent" class="tab-content">
+
+                    <section id="information-section" class="tab-pane fade in active fan-section">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Information</h4>
+                        </div>
+                        <div class="operating-point-controls">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label style="min-width:100px;">Air flow:</label>
+                                    <input type="text" class="form-control input-sm" id="set-flow" value="1000" placeholder="Flow">
+                                    <span style="min-width:40px;display: inline-block;" class="unit flow-unit">m³/h</span>
+
+                                </div>
+                                <div class="form-group">
+                                    <label style="min-width:100px;">Pressure:</label>
+                                    <input type="text" class="form-control input-sm" id="set-pressure" value="200" placeholder="Pressure">
+                                    <span style="min-width:40px;display: inline-block;" class="unit pressure-unit">Pa</span>
+
+                                </div>
+                                <div class="form-group">
+                                    <label style="min-width:100px;">Medium temp:</label>
+                                    <input type="text" class="form-control input-sm" id="set-temp" value="20" placeholder="°C">
+                                    <span style="min-width:40px;display: inline-block;" class="unit">°C</span>
+                                </div>
+                                <div class="form-group">
+                                    <label style="min-width:100px;">Density:</label>
+                                    <input type="text" class="form-control input-sm" id="set-density" value="1.204" placeholder="density">
+                                    <span style="min-width:40px;display: inline-block;" class="unit density-unit">kg/m³</span>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" id="calculate-point" style="display:none;">Calculate</button>
+                            </div>
+                        </div>
+
+                        <!-- 操作点数据表格 -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Operating Point Data</h4>
+                                <table class="table table-bordered table-striped" id="operating-point-table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Calculated operating point</th>
+                                            <th>The point of highest efficiency</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Flow</td>
+                                            <td><span id="op-flow">0</span> <span class="flow-unit">m³/h</span></td>
+                                            <td><span id="max-flow">0</span> <span class="flow-unit">m³/h</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Static pressure</td>
+                                            <td><span id="op-static-pressure">0</span> <span class="pressure-unit">Pa</span></td>
+                                            <td><span id="max-static-pressure">0</span> <span class="pressure-unit">Pa</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Speed</td>
+                                            <td><span id="op-speed">0</span> <span class="speed-unit">rpm</span></td>
+                                            <td><span id="max-speed">0</span> <span class="speed-unit">rpm</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Power</td>
+                                            <td><span id="op-power">0</span> <span class="power-unit">W</span></td>
+                                            <td><span id="max-power">0</span> <span class="power-unit">W</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Static efficiency</td>
+                                            <td><span id="op-static-efficiency">0</span> %</td>
+                                            <td><span id="max-static-efficiency">0</span> %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+							<div class="col-md-12">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td>Fan Model</td>
+                                        <td>{$fan.fan_model}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Motor Type</td>
+                                        <td>{$fan.motor_type}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Protection Type</td>
+                                        <td>{$fan.protection_type}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Insulation Class</td>
+                                        <td>{$fan.insulation_class}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Operating Temperature</td>
+                                        <td>{$fan.min_operating_temp}°C ~ {$fan.max_operating_temp}°C</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+							</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 风机描述 -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Description</h4>
+                        </div>
+                        <div class="panel-body">
+                            <p>Backward Curved Centrifugal Fans are radial fans with blades bent back. They are characterized by extremely high available pressures and a compact design. The aerodynamic rotor geometry and the shape of blades combined with energy-efficient electronically commutated EC motors or high-efficiency AC induction motors provide very favorable operating parameters: high capacity, efficiency, and the ability to cope with high flow resistance.</p>
+                            <p>Such fans are widely used in devices where there are high air flow resistances, where a compact design or smooth capacity regulation is required: recuperators, ventilation units, filtration devices, etc.</p>
+                        </div>
+                    </div>
+                    </section>
+
+
+                    
+                    <!-- 额定参数部分 -->
+                    <section id="nominal-section" class="tab-pane fade fan-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4>Nominal Parameters</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h5>Nominal parameters</h5>
+                                                <table class="table table-striped">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Rated Voltage</td>
+                                                            <td><span class="value">{$fan.rated_voltage}</span> <span class="unit">V</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Maximum Airflow</td>
+                                                            <td><span class="value">{$fan.air_flow}</span> <span class="unit flow-unit">m³/h</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Free pressure</td>
+                                                            <td><span class="value">{$fan.air_pressure}</span> <span class="unit pressure-unit">Pa</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Type of motor control</td>
+                                                            <td>{$fan.motor_type}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Number of Motor Poles</td>
+                                                            <td>6</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Motor protection class</td>
+                                                            <td>{$fan.protection_type}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <h5>Electrical parameters</h5>
+                                                <table class="table table-striped">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Number of phases</td>
+                                                            <td>1</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Nominal voltage</td>
+                                                            <td><span class="value">{$fan.rated_voltage}</span> <span class="unit">V</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Maximum power consumption</td>
+                                                            <td><span class="value">{$fan.rated_power}</span> <span class="unit power-unit">W</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Nominal frequency</td>
+                                                            <td><span class="value">{$fan.frequency}</span> <span class="unit">Hz</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <h5>Dimensions</h5>
+                                                <table class="table table-striped">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Diameter</td>
+                                                            <td><span class="value">{$fan.impeller_diameter}</span> <span class="unit">mm</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Unit weight</td>
+                                                            <td><span class="value">{$fan.weight}</span> <span class="unit">kg</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h5>Ambient conditions</h5>
+                                                <table class="table table-striped">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Minimum operating temperature</td>
+                                                            <td><span class="value">{$fan.min_operating_temp}</span> <span class="unit">°C</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Maximum operating temperature</td>
+                                                            <td><span class="value">{$fan.max_operating_temp}</span> <span class="unit">°C</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-12" style="display:none;">
+                                                <h5>Acoustics</h5>
+                                                <table class="table table-striped">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Hz</th>
+                                                            <th>63</th>
+                                                            <th>125</th>
+                                                            <th>250</th>
+                                                            <th>500</th>
+                                                            <th>1k</th>
+                                                            <th>2k</th>
+                                                            <th>4k</th>
+                                                            <th>8k</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>dB</td>
+                                                            <td>77</td>
+                                                            <td>83</td>
+                                                            <td>79</td>
+                                                            <td>77</td>
+                                                            <td>72</td>
+                                                            <td>65</td>
+                                                            <td>58</td>
+                                                            <td>49</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- 尺寸部分 -->
+                    <section id="dimensions-section" class="tab-pane fade fan-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4>Dimensions</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="outline-image text-center">
+                                                    {notempty name="fan.outline_image"}
+                                                    <img src="/assets/fan/outline/{$fan.outline_image}.jpg" class="img-responsive center-block" alt="Outline Dimensions">
+                                                    {else/}
+                                                    <img src="/assets/fan/outline/outline_default.jpg" class="img-responsive center-block" alt="Outline Dimensions">
+                                                    {/notempty}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- 电气连接部分 -->
+                    <section id="electrical-section" class="tab-pane fade fan-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4>Electrical Connection</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table table-striped">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Operating Voltage</td>
+                                                            <td>{$fan.min_operating_voltage}V ~ {$fan.max_operating_voltage}V</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Frequency</td>
+                                                            <td>{$fan.frequency} Hz</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Speed Control</td>
+                                                            <td>{$fan.speed_control}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Wiring Mode</td>
+                                                            <td>{$fan.wiring_mode}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="circuit-image text-center">
+                                                    {notempty name="fan.circuit_image"}
+                                                    <img src="/assets/fan/circuit/{$fan.circuit_image}.png" class="img-responsive center-block" alt="Circuit Diagram">
+                                                    {else/}
+                                                    <img src="/assets/img/no-image.png" class="img-responsive center-block" alt="Circuit Diagram">
+                                                    {/notempty}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                
+                </div>
+            </div>
+            
+            <!-- 右侧PQ曲线图 -->
+            <div class="col-md-7">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Performance Curves</h4>
+						
+						<!-- Add this button in the operating-point-controls div in detail.html -->
+						<div class="form-group pull-right download-spec" style="display:none;margin-bottom:0;margin-top:-20px;">
+							<button type="button" class="btn btn-success btn-sm" id="download-spec">
+								<i class="fa fa-download"></i> Download Specification
+							</button>
+						</div>
+
+
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <!-- 压力-流量曲线 -->
+                            <div class="col-md-12">
+                                <div id="pressure-flow-chart" style="height: 400px;"></div>
+                            </div>
+                            <!-- 功率和效率曲线 -->
+                            <div class="col-md-6">
+                                <div id="power-chart" style="height: 300px;"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="efficiency-chart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 声音数据 -->
+                        <div class="row hide">
+                            <div class="col-md-4">
+                                <h5>Sound Power Level L<sub>WA</sub> (dB[A])</h5>
+                                <div id="sound-power-chart" style="height: 200px;"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <h5>Sound Pressure Level L<sub>PA</sub> (dB[A])</h5>
+                                <div id="sound-pressure-chart" style="height: 200px;"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <h5>Sound Pressure Level L<sub>P</sub> (dB)</h5>
+                                <div id="sound-pressure-level-chart" style="height: 200px;"></div>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+</div>
+<script>
+// 从PHP获取的风量范围
+var ori_flow = [100, <?= $air_flow_range['max'] ?>];
+</script>        
+

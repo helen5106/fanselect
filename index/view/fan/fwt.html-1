@@ -1,0 +1,338 @@
+<style>
+@media (min-width: 1700px){.container{width:1440px}}
+
+/* sliders */
+input[type=range]{height:25px;-webkit-appearance:none;margin:10px 0;width:100%}
+input[type=range]:focus{outline:none}
+input[type=range]::-webkit-slider-runnable-track{height:5px;background:#5cb85c;border-radius:1px}
+input[type=range]::-webkit-slider-thumb{border:1px solid #5cb85c;height:18px;width:18px;border-radius:25px;background:#fff;cursor:pointer;-webkit-appearance:none;margin-top:-7px}
+
+/* fan type card */
+.fan-option{padding:15px;border:2px solid #ddd;border-radius:5px;transition:all .2s}
+.fan-option:hover{border-color:#5bc0de;box-shadow:0 0 10px rgba(91,192,222,.25)}
+.fan-option.selected{border-color:#5bc0de;background:#f0f9fc;box-shadow:0 0 12px rgba(91,192,222,.35)}
+
+/* table scroll + sticky header */
+.table-scroll{position:relative;overflow-x:auto;overflow-y:visible;border:1px solid #eee;border-radius:4px}
+.table-scroll .table{margin-bottom:0;min-width:1600px}
+.table-scroll thead th{position:sticky;top:0;background:#f9fafb;color:#34495e;font-weight:600;white-space:nowrap;z-index:2;box-shadow:0 1px 0 #eaeaea}
+.table-scroll tbody td{white-space:nowrap}
+.solution-table tbody tr{cursor:pointer}
+.solution-table tbody tr.selected{background:#66de42c7}
+
+/* charts side-by-side */
+.charts-row{margin-left:-8px;margin-right:-8px}
+.charts-row>[class*="col-"]{padding-left:8px;padding-right:8px}
+.chart-container{width:100%;height:360px;margin-top:10px;border:1px solid #eaeaea;border-radius:4px;background:#fafafa;overflow:visible}
+@media (max-width:991px){.chart-container{height:320px}}
+
+/* right sticky saved panel (collapsed until first item) */
+#fanwall-saved{
+  position:fixed;
+  right:0;
+  top:120px;
+  z-index:1000;
+  width:64px;
+  overflow:visible;
+  display:none;
+}
+#fanwall-saved .fw-panel{
+  margin:0;
+  border-left:none;
+  border-radius:0;
+  max-height:70vh;
+  overflow:visible;
+  background:transparent;
+  box-shadow:none;
+}
+/* 把 handle 隐藏掉，不再显示蓝色文件夹 */
+#fanwall-saved .saved-handle{
+  display:none;
+}
+
+/* 保存的方案 note 图标列表，顶部不需要预留空间了 */
+#fanwall-saved #fanwall-saved-list{
+  margin:0;
+  padding:8px 8px 8px 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+
+/* 单个方案 note 图标 */
+.saved-note{
+  position:relative;
+  width:38px;
+  height:38px;
+  margin:6px 0;
+  border-radius:4px;
+  background:#fffbe6;
+  border:1px solid #f1c40f;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+}
+.saved-note i{
+  font-size:18px;
+  color:#f1c40f;
+}
+
+/* 编号小圆点 */
+.saved-note-index{
+  position:absolute;
+  bottom:-6px;
+  right:-6px;
+  padding:0 5px;
+  font-size:10px;
+  line-height:16px;
+  background:#3498db;
+  color:#fff;
+  border-radius:10px;
+}
+
+/* 删除按钮（右上角小 x） */
+.saved-note-remove{
+  position:absolute;
+  top:-7px;
+  right:-7px;
+  width:16px;
+  height:16px;
+  line-height:14px;
+  text-align:center;
+  border-radius:50%;
+  border:0;
+  background:#fff;
+  color:#999;
+  font-size:10px;
+  cursor:pointer;
+  box-shadow:0 0 2px rgba(0,0,0,.3);
+}
+.saved-note-remove:hover{ color:#e74c3c; }
+
+
+/* 用你的 456x456 风机示意图 */
+.fanwall-cell {
+  background-image: url('__CDN__/assets/img/fanwall_unit.png?v=1');
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* 编号的小标签 */
+.fanwall-cell-label {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  min-width: 18px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 1.3;
+  text-align: center;
+  color: #333;
+  background: rgba(255,255,255,.85);
+  border-radius: 10px;
+  border: 1px solid #3c8dbc;
+  box-shadow: 0 0 3px rgba(0,0,0,.15);
+}
+
+
+</style>
+
+<div class="container">
+  <div class="panel panel-default" id="fanwall-page">
+    <div class="panel-heading">
+      <strong>{:__('Fan Wall Selection')}</strong>
+    </div>
+
+    <div class="panel-body" style="background:#f8f9fa">
+      <!-- 上：左右两列 —— 左侧 fan type，右侧其它参数 -->
+      <div class="row">
+        <!-- Left: Fan Type -->
+        <div class="col-md-4">
+          <div class="panel panel-info">
+            <div class="panel-heading"><h4 class="panel-title">{:__('Select Fan Wall Type')}</h4></div>
+            <div class="panel-body">
+              <div class="radio">
+                <label>
+                  <input type="radio" name="fan_type" value="AHU" checked>
+                  <div class="fan-option">
+                    <img src="__CDN__/assets/img/axial_fan.png?v=1.5" class="img-responsive center-block" style="max-height:180px">
+                    <h4 class="text-center">{:__('Axial Fan')}</h4>
+                    <p class="text-center text-muted">{:__('High airflow, lower pressure')}</p>
+                  </div>
+                </label>
+              </div>
+              <div class="radio" style="margin-top:18px">
+                <label>
+                  <input type="radio" name="fan_type" value="CTF">
+                  <div class="fan-option">
+                    <img src="__CDN__/assets/img/centrifugal_fan.png?v=1.5" class="img-responsive center-block" style="max-height:180px">
+                    <h4 class="text-center">{:__('Centrifugal Fan')}</h4>
+                    <p class="text-center text-muted">{:__('Higher pressure, controlled airflow')}</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Config form -->
+        <div class="col-md-8">
+          <div class="panel panel-success">
+            <div class="panel-heading"><h4 class="panel-title">{:__('Fan Configurator')}</h4></div>
+            <div class="panel-body">
+              <form id="fanwall-form" class="form-horizontal" role="form">
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">{:__('Opening Size')}</label>
+                  <div class="col-sm-8">
+                    <div class="row">
+                      <div class="col-xs-6">
+                        <div class="input-group">
+                          <input type="number" step="1" min="0" class="form-control" id="width" placeholder="{:__('Width / Length')}">
+                          <span class="input-group-addon">{:__('mm')}</span>
+                        </div>
+                        <input type="range" id="width-range" min="0" max="10000" step="10" value="0">
+                      </div>
+                      <div class="col-xs-6">
+                        <div class="input-group">
+                          <input type="number" step="1" min="0" class="form-control" id="height" placeholder="{:__('Height / Width')}">
+                          <span class="input-group-addon">{:__('mm')}</span>
+                        </div>
+                        <input type="range" id="height-range" min="0" max="10000" step="10" value="0">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">{:__('Target Airflow')}</label>
+                  <div class="col-sm-8">
+                    <div class="input-group">
+                      <input type="number" step="1" min="0" class="form-control" id="airflow" placeholder="m³/h">
+                      <span class="input-group-addon">m³/h</span>
+                    </div>
+                    <input type="range" id="airflow-range" min="0" max="500000" step="100" value="0">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">{:__('Target Static Pressure')}</label>
+                  <div class="col-sm-8">
+                    <div class="input-group">
+                      <input type="number" step="1" min="0" class="form-control" id="pressure" placeholder="Pa">
+                      <span class="input-group-addon">Pa</span>
+                    </div>
+                    <input type="range" id="pressure-range" min="0" max="5000" step="5" value="0">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">{:__('Controller')}</label>
+                  <div class="col-sm-8">
+                    <label class="radio-inline"><input type="radio" name="controller_location" value="inside" checked> {:__('Inside')}</label>
+                    <label class="radio-inline"><input type="radio" name="controller_location" value="outside"> {:__('Outside')}</label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">{:__('Redundancy')}</label>
+                  <div class="col-sm-8">
+                    <select id="redundancy" class="form-control">
+                      <option value="N+0">N+0</option>
+                      <option value="N+1">N+1</option>
+                      <option value="N+2">N+2</option>
+                      <option value="N+3">N+3</option>
+                      <option value="N+4">N+4</option>
+                      <option value="N+5">N+5</option>
+                      <option value="N">{:__('N + N(Double Units)')}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <fieldset>
+                  <legend>{:__('Project Info')}</legend>
+                  <div class="form-group">
+                    <label class="col-sm-4 control-label">{:__('Project Code')}</label>
+                    <div class="col-sm-8"><input type="text" class="form-control" id="project_code" placeholder="{:__('e.g. 2025-0001')}"></div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-4 control-label">{:__('Project Name')}</label>
+                    <div class="col-sm-8"><input type="text" class="form-control" id="project_name" placeholder="{:__('e.g. Warehouse A')}"></div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-4 control-label">{:__('Device Code')}</label>
+                    <div class="col-sm-8"><input type="text" class="form-control" id="device_code" placeholder="{:__('e.g. AHU-01#')}"></div>
+                  </div>
+                </fieldset>
+
+                <div class="form-group">
+                  <div class="col-sm-offset-4 col-sm-8">
+                    <button type="button" id="configure-btn" class="btn btn-primary">
+                      <i class="fa fa-filter"></i> {:__('Filter')}
+                    </button>
+                    <button type="button" id="btn-reset" class="btn btn-default">{:__('Reset')}</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div><!--/right-->
+      </div><!--/row top-->
+
+      <!-- 下：整块显示结果（表格 + 两张图并排） -->
+      <div class="row" id="results-row" style="margin-top:8px">
+        <div class="col-sm-12">
+          <div id="result-box">
+            <div class="alert alert-info" style="margin-top:10px;">
+              {:__('Enter the target airflow and static pressure, then click “Filter”. The system calculates unit count with the max VSP curve & interpolation, and plots single/fan-wall PQ and power curves.')}
+            </div>
+          </div>
+
+          <!-- 当前选中方案工具条 -->
+          <div id="plans-toolbar" class="text-right" style="display:none;">
+            <button class="btn btn-success btn-xs" id="btn-save-selected"><i class="fa fa-save"></i> {:__('Save Selection')}</button>
+            <button class="btn btn-default btn-xs" id="btn-export-selected"><i class="fa fa-file-excel-o"></i> {:__('Export to Excel')}</button>
+            <button class="btn btn-info btn-xs" id="btn-layout-selected"><i class="fa fa-th"></i> {:__('View Fan-Wall Schematic')}</button>
+          </div>
+
+          <!-- 方案表格 -->
+          <div id="plans-box"></div>
+
+          <!-- Charts: side-by-side -->
+          <div id="charts-box" style="display:none;">
+            <div class="row charts-row">
+              <div class="col-sm-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">{:__('PQ Curve')}</div>
+                  <div class="panel-body"><div id="chart-pq" class="chart-container"></div></div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">{:__('Power vs Airflow')}</div>
+                  <div class="panel-body"><div id="chart-power" class="chart-container"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!--/col-->
+      </div><!--/row results-->
+      
+    </div><!--/panel-body-->
+  </div><!--/panel-->
+</div><!--/container-->
+
+<!-- Right sticky saved list -->
+<div id="fanwall-saved" class="fw-collapsed">
+  <div class="saved-handle" title="{:__('Saved Fan-Wall Cases')}"><i class="fa fa-folder-open"></i></div>
+  <div class="panel panel-default fw-panel">
+    <div class="panel-heading" style="display:none;"><strong>{:__('Saved Fan-Wall Cases')}</strong></div>
+    <div class="list-group" id="fanwall-saved-list">
+      <div class="list-group-item text-muted">{:__('(Empty)')}</div>
+    </div>
+  </div>
+</div>
+
